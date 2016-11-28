@@ -16,6 +16,7 @@ import (
 	"fmt"
 
 	"github.com/inimei/backup/log"
+	"github.com/inimei/ddns/web/signature"
 )
 
 var (
@@ -138,7 +139,19 @@ func postIp(ip string) error {
 	}
 	client := &http.Client{Transport: trans}
 
-	resp, err := client.PostForm(Data.ServerHost+"update", values)
+	data := values.Encode()
+	url := "/api/update"
+
+	req, err := http.NewRequest("POST", Data.ServerHost+url, strings.NewReader(data))
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	signature.SignRequest(req, data, Data.Accesskey, Data.SecretKey, "application/x-www-form-urlencoded")
+
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Error(err.Error())
 		return err

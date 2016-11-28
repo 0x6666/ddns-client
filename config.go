@@ -15,6 +15,8 @@ type cfgData struct {
 	Key        string `toml:"key"`
 	ServerHost string `toml:"server_host"`
 	TickTime   int64  `toml:"tick_time"`
+	Accesskey  string `toml:"accesskey"`
+	SecretKey  string `toml:"secretKey"`
 }
 
 var Data cfgData
@@ -61,8 +63,12 @@ func initialize(configFilePath string) error {
 		return err
 	}
 
-	if !strings.HasSuffix(Data.ServerHost, "/") && len(Data.ServerHost) != 0 {
-		Data.ServerHost = Data.ServerHost + "/"
+	if strings.HasSuffix(Data.ServerHost, "/") {
+		Data.ServerHost = strings.TrimSuffix(Data.ServerHost, "/")
+	}
+
+	if len(Data.Key) == 0 || len(Data.Accesskey) == 0 || len(Data.SecretKey) == 0 {
+		panic("key or accesskey , secretKey can't be empty")
 	}
 
 	return nil
