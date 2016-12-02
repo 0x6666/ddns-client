@@ -21,6 +21,7 @@ import (
 
 var (
 	ipServer = "http://pv.sohu.com/cityjson?ie=utf-8"
+	lastIP   = ""
 )
 
 func main() {
@@ -66,6 +67,12 @@ func update() {
 		log.Error(err.Error())
 		return
 	}
+
+	if ip == lastIP {
+		log.Debug("no change")
+		return
+	}
+	lastIP = ip
 
 	err = postIp(ip)
 	if err != nil {
